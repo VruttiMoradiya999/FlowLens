@@ -1,5 +1,5 @@
 from agno.agent import Agent
-from agno.models.anthropic import Claude
+from agno.models.ollama import Ollama
 from agno.tools import tool
 from memory import search_my_day, get_tool_timeline
 import os
@@ -23,7 +23,7 @@ def get_ai_usage_timeline(video_id: str) -> str:
 # Create the FlowLens Agent
 flowlens_agent = Agent(
     name="FlowLens",
-    model=Claude(id="claude-3-5-sonnet-20240620", api_key=os.getenv("ANTHROPIC_API_KEY")),
+    model = Ollama(id="llama3.2", host="http://localhost:11434"),
     tools=[search_session, get_ai_usage_timeline],
     instructions="""
     You are FlowLens — an AI productivity coach who has been 

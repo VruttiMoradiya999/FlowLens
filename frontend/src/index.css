@@ -1,0 +1,528 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap');
+
+/* ── Cute & Cool Pastel Design System ── */
+:root {
+  --bg: #FFF5F6;           /* Very soft pastel warm pink-white */
+  --surface: #ffffff;      /* Pure white for containers */
+  --accent-pink: #F7A8B8;  /* Playful pastel pink */
+  --accent-cool: #1D9E75;  /* Cool teal green */
+  --accent-cool-light: #E8F5F1;
+  --dark: #1B2A24;         /* Soft warm dark-grayish black for high-contrast borders & text */
+  --muted: #6C7A74;
+  --radius: 20px;          /* Super soft rounded corners */
+  --border-width: 2px;
+  
+  --transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  background-color: var(--bg);
+  color: var(--dark);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  /* Polka dot pattern background like the reference image */
+  background-image: radial-gradient(var(--accent-pink) 15%, transparent 16%),
+                    radial-gradient(var(--accent-pink) 15%, transparent 16%);
+  background-size: 40px 40px;
+  background-position: 0 0, 20px 20px;
+  background-attachment: fixed;
+  opacity: 0.99; /* Smooth rendering */
+}
+
+/* ── Navigation ── */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+  background-color: var(--surface);
+  border-bottom: var(--border-width) solid var(--dark);
+  margin-bottom: 2rem;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.brand-name {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--dark);
+  letter-spacing: -0.5px;
+}
+
+.brand-dot {
+  width: 10px;
+  height: 10px;
+  background-color: var(--accent-cool);
+  border: var(--border-width) solid var(--dark);
+  border-radius: 50%;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  transition: var(--transition);
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: var(--border-width) solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--dark);
+  background-color: var(--accent-pink);
+  border-color: var(--dark);
+  transform: translateY(-2px);
+}
+
+/* ── Layout & Hero ── */
+.page-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 5rem 1.5rem;
+}
+
+.hero {
+  text-align: center;
+  background-color: var(--surface);
+  border: var(--border-width) solid var(--dark);
+  border-radius: var(--radius);
+  padding: 3.5rem 2rem;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 6px 6px 0px var(--dark); /* Neo-brutalist soft shadow */
+}
+
+/* Slanted pink decoration block like the HONEYGLOW header */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background-color: var(--accent-pink);
+  border-bottom: var(--border-width) solid var(--dark);
+  transform: skewY(-2deg);
+  transform-origin: top left;
+  z-index: 1;
+}
+
+.hero h1, .hero p, .hero .btn, .hero div {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--dark);
+  margin-bottom: 1.25rem;
+  /* Highlight style like the reference image */
+  display: inline-block;
+  background-color: var(--surface);
+  padding: 4px 16px;
+  border: var(--border-width) solid var(--dark);
+  transform: rotate(-1deg);
+}
+
+.hero p {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--dark);
+  margin: 1.5rem 0 2rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── Cozy Neo-Brutalist Buttons ── */
+.btn {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 0.8rem 2rem;
+  border-radius: 999px;
+  border: var(--border-width) solid var(--dark);
+  background-color: var(--surface);
+  color: var(--dark);
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  box-shadow: 4px 4px 0px var(--dark);
+}
+
+.btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--dark);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--dark);
+}
+
+.btn-primary {
+  background-color: var(--accent-cool);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: #178361;
+}
+
+.btn-danger {
+  background-color: #ff6b8b;
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  background-color: #e05372;
+}
+
+/* ── Cute Metric Cards ── */
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.card {
+  background-color: var(--surface);
+  border: var(--border-width) solid var(--dark);
+  border-radius: var(--radius);
+  padding: 2rem;
+  position: relative;
+  transition: var(--transition);
+  box-shadow: 6px 6px 0px var(--dark);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 8px 8px 0px var(--dark);
+}
+
+.card h2 {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.35rem;
+  margin-bottom: 1.25rem;
+  display: inline-block;
+  border-bottom: 3px solid var(--accent-pink);
+}
+
+.card-title {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.card-value {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+/* Handwritten signature accent like "Hi, I'm Sana!" in the reference image */
+.handwritten-accent {
+  font-family: 'Caveat', cursive;
+  font-size: 2.25rem;
+  color: var(--accent-cool);
+  transform: rotate(-3deg);
+  display: inline-block;
+  margin-top: 10px;
+}
+
+/* ── Live Monitor ── */
+.badge-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background-color: var(--surface);
+  border: var(--border-width) solid var(--dark);
+  border-radius: 999px;
+  padding: 10px 24px;
+  margin-bottom: 2.5rem;
+  box-shadow: 4px 4px 0px var(--dark);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: var(--border-width) solid var(--dark);
+}
+
+.badge-active {
+  background-color: var(--accent-pink);
+  color: var(--dark);
+}
+
+.badge-pulse {
+  width: 10px;
+  height: 10px;
+  background-color: var(--accent-cool);
+  border: 1px solid var(--dark);
+  border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+
+.monitor-container {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 2rem;
+}
+
+.chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.chart-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.bar-bg {
+  height: 16px;
+  background-color: var(--bg);
+  border: var(--border-width) solid var(--dark);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: inset 1px 1px 0px rgba(0,0,0,0.1);
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: var(--accent-cool);
+  border-radius: 999px;
+  border-right: var(--border-width) solid var(--dark);
+  transition: width 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.alert-card {
+  display: flex;
+  gap: 12px;
+  padding: 1.2rem;
+  background-color: #FFF2F4;
+  border: var(--border-width) solid var(--dark);
+  border-radius: var(--radius);
+  color: var(--dark);
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 3px 3px 0px var(--dark);
+}
+
+/* ── Circular Mastery Score ── */
+.circle-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 3rem 0;
+}
+
+.circle-score {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background-color: var(--surface);
+  border: 4px solid var(--dark);
+  outline: 8px solid var(--accent-pink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 6px 6px 0px var(--dark);
+  transform: rotate(-3deg);
+  transition: var(--transition);
+}
+
+.circle-score:hover {
+  transform: rotate(3deg) scale(1.05);
+}
+
+.circle-score-val {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+
+.circle-score-lbl {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: -4px;
+}
+
+/* ── Tips & List Sections ── */
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.tip-item {
+  display: flex;
+  gap: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  align-items: flex-start;
+}
+
+.tip-num {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: var(--accent-cool);
+  border: var(--border-width) solid var(--dark);
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Search Page ── */
+.search-box {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 1.05rem;
+  font-weight: 500;
+  padding: 0.9rem 1.25rem;
+  border-radius: 999px;
+  border: var(--border-width) solid var(--dark);
+  outline: none;
+  background-color: var(--surface);
+  transition: var(--transition);
+  box-shadow: 4px 4px 0px var(--dark);
+}
+
+.search-input:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0px var(--dark);
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 3rem;
+}
+
+.chip {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background-color: var(--surface);
+  border: var(--border-width) solid var(--dark);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 3px 3px 0px var(--dark);
+}
+
+.chip:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0px var(--dark);
+  background-color: var(--accent-pink);
+}
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.result-item {
+  border-bottom: var(--border-width) dashed var(--dark);
+  padding-bottom: 1.5rem;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.result-time {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.result-desc {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--dark);
+}

@@ -2,14 +2,10 @@ import os
 import base64
 import time
 import json
-from openai import OpenAI
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-
-client = None
-if os.getenv("OPENAI_API_KEY"):
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Global store for live prompts
 live_data_store = {
@@ -19,10 +15,7 @@ live_data_store = {
 }
 
 def analyze_latest_frame():
-    """Reads the latest frame, detects Antigravity/prompts, and updates live data."""
-    if not client:
-        return
-        
+    """Reads the latest frame, detects Antigravity/prompts, and updates live data using local Ollama."""
     latest_img = "/tmp/flowlens_latest.jpg"
     if not os.path.exists(latest_img):
         return
@@ -31,8 +24,12 @@ def analyze_latest_frame():
     if time.time() - os.path.getmtime(latest_img) > 10:
         return
 
-    with open(latest_img, "rb") as image_file:
-        base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+    try:
+        with open(latest_img, "rb") as image_file:
+            base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+    except Exception as e:
+        print(f"Error reading frame: {e}")
+        return
 
     system_prompt = """
     You are an AI assistant monitoring a user's screen in real-time.
@@ -57,53 +54,62 @@ def analyze_latest_frame():
     """
 
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
+        # Use llama3.2-vision (or llava) for local Vision processing
+        payload = {
+            "model": "llama3.2-vision",
+            "messages": [
                 {
                     "role": "user",
-                    "content": [
-                        {"type": "text", "text": system_prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{base64_image}"
-                            }
-                        }
-                    ]
+                    "content": system_prompt,
+                    "images": [base64_image]
                 }
             ],
-            response_format={ "type": "json_object" },
-            max_tokens=300
-        )
+            "stream": False,
+            "format": "json"
+        }
         
-        result = json.loads(response.choices[0].message.content)
+        response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=15)
         
-        if result.get("is_ai_active"):
-            live_data_store["current_tool"] = result.get("tool_name", "AI")
+        if response.status_code != 200:
+            # Fallback to llava
+            payload["model"] = "llava"
+            response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=15)
+
+        if response.status_code == 200:
+            response_data = response.json()
+            message_content = response_data["message"]["content"]
+            result = json.loads(message_content)
             
-            if result.get("prompt_found") and result.get("original_prompt"):
-                orig = result["original_prompt"]
-                if len(orig) > 5 and not any(p["original"] == orig for p in live_data_store["prompts"]):
-                    import datetime
-                    now = datetime.datetime.now().strftime("%I:%M %p")
-                    
-                    new_prompt = {
-                        "id": live_data_store["next_id"],
-                        "time": now,
-                        "score": result.get("score", 50),
-                        "original": orig,
-                        "improved": result.get("improved_prompt", ""),
-                        "lessons": result.get("lessons", [])
-                    }
-                    live_data_store["prompts"].insert(0, new_prompt) # Prepend
-                    live_data_store["next_id"] += 1
-                    
-                    if len(live_data_store["prompts"]) > 10:
-                        live_data_store["prompts"] = live_data_store["prompts"][:10]
+            if result.get("is_ai_active"):
+                live_data_store["current_tool"] = result.get("tool_name", "AI")
+                
+                if result.get("prompt_found") and result.get("original_prompt"):
+                    orig = result["original_prompt"]
+                    if len(orig) > 5 and not any(p["original"] == orig for p in live_data_store["prompts"]):
+                        import datetime
+                        now = datetime.datetime.now().strftime("%I:%M %p")
                         
+                        new_prompt = {
+                            "id": live_data_store["next_id"],
+                            "time": now,
+                            "score": result.get("score", 50),
+                            "original": orig,
+                            "improved": result.get("improved_prompt", ""),
+                            "lessons": result.get("lessons", [])
+                        }
+                        live_data_store["prompts"].insert(0, new_prompt) # Prepend
+                        live_data_store["next_id"] += 1
+                        
+                        if len(live_data_store["prompts"]) > 10:
+                            live_data_store["prompts"] = live_data_store["prompts"][:10]
+        else:
+            print(f"Ollama returned error status: {response.status_code}")
+                            
+    except requests.exceptions.ConnectionError:
+        # Avoid massive traceback spam if Ollama is not yet active/installed
+        pass
     except Exception as e:
-        print(f"Error analyzing frame: {e}")
+        print(f"Error analyzing frame via Ollama: {e}")
 
 def continuous_analysis_loop():
     while True:

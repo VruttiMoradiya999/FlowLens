@@ -1,162 +1,193 @@
 import React, { useState, useEffect } from 'react';
-import { Eye, Code, Zap, Clock, Square, Play, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function LiveMonitor() {
   const navigate = useNavigate();
-  const [isActive, setIsActive] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [sessionTime, setSessionTime] = useState(0);
+  const [online, setOnline] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [timePassed, setTimePassed] = useState(0);
   const [liveData, setLiveData] = useState({
-    currentTool: 'None',
-    taskType: 'Idle',
-    promptQuality: 0
+    chatgpt: 67,
+    claude: 18,
+    perplexity: 5,
+    promptQuality: 72,
+    alerts: [
+      { id: 1, text: 'Tool Mismatch: Used ChatGPT for complex coding task (suggest: Claude).' },
+      { id: 2, text: 'Vague Prompt: "fix this code" without system context or error stack.' }
+    ]
   });
 
-  // Handle session timer
+  // Timer for session duration
   useEffect(() => {
-    let interval = null;
-    if (isActive) {
-      interval = setInterval(() => setSessionTime(t => t + 1), 1000);
-    } else {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [isActive]);
+    const timer = setInterval(() => {
+      setTimePassed(t => t + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-  // Poll live data
+  // Poll GET /health every 3 seconds to stay live
   useEffect(() => {
-    let pollInterval = null;
-    if (isActive) {
-      pollInterval = setInterval(async () => {
-        try {
-          const res = await fetch('http://localhost:8000/live_prompts');
-          const data = await res.json();
-          if (data && data.current_tool) {
-            setLiveData({
-              currentTool: data.current_tool,
-              taskType: data.prompts.length > 0 ? 'Research/Writing' : 'Idle',
-              promptQuality: data.prompts.length > 0 ? data.prompts[0].score : 0
-            });
-          }
-        } catch (e) {
-          console.error("Error fetching live data", e);
+    const checkHealth = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/health');
+        if (res.ok) {
+          setOnline(true);
+        } else {
+          setOnline(false);
         }
-      }, 5000); // Poll every 5 seconds
-    }
-    return () => clearInterval(pollInterval);
-  }, [isActive]);
+      } catch (err) {
+        setOnline(false);
+      }
+    };
 
-  const handleStart = async () => {
+    checkHealth(); // initial check
+    const healthInterval = setInterval(checkHealth, 3000);
+    return () => clearInterval(healthInterval);
+  }, []);
+
+  // Real-time backend live data polling
+  useEffect(() => {
+    const fetchLivePrompts = async () => {
+      try {
+        const res = await fetch('http://localhost:8000/live_prompts');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.prompts && data.prompts.length > 0) {
+            // Update live metrics from real analyzer data
+            const latest = data.prompts[0];
+            setLiveData(prev => ({
+              ...prev,
+              promptQuality: latest.score || prev.promptQuality,
+              alerts: latest.lessons.length > 0 
+                ? latest.lessons.map((lbl, idx) => ({ id: idx + 3, text: lbl }))
+                : prev.alerts
+            }));
+          }
+        }
+      } catch (err) {
+        console.error("Error polling live prompts:", err);
+      }
+    };
+
+    const dataInterval = setInterval(fetchLivePrompts, 5000);
+    return () => clearInterval(dataInterval);
+  }, []);
+
+  const handleStopSession = async () => {
+    setLoading(true);
     try {
-      await fetch('http://localhost:8000/session/start', { method: 'POST' });
-      setIsActive(true);
-      setSessionTime(0);
-    } catch (e) {
-      console.error("Start error", e);
-      setIsActive(true); // Fallback for UI demo
+      const res = await fetch('http://localhost:8000/session/stop', {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const videoId = data.video_id || 'demo-video-id';
+        localStorage.setItem('flowlens_video_id', videoId);
+        navigate(`/report?id=${videoId}`);
+      } else {
+        throw new Error('Stop session failed');
+      }
+    } catch (err) {
+      console.error(err);
+      // Fallback demo redirect
+      const demoId = 'demo-' + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem('flowlens_video_id', demoId);
+      navigate(`/report?id=${demoId}`);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleStop = async () => {
-    setIsActive(false);
-    setIsProcessing(true);
-    try {
-      await fetch('http://localhost:8000/session/stop', { method: 'POST' });
-      // Simulate indexing time then navigate to report
-      setTimeout(() => {
-        setIsProcessing(false);
-        localStorage.setItem('flowlens_report', 'true');
-        navigate('/report');
-      }, 3000);
-    } catch (e) {
-      console.error("Stop error", e);
-      setIsProcessing(false);
-    }
-  };
-
-  const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) return `${h}h ${m}m`;
+  const formatTime = (secs) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
     return `${m}m ${s}s`;
   };
 
   return (
-    <div className="glass-card">
-      <header className="card-header">
-        <div className={`icon-container eye-icon ${isActive ? 'pulse' : ''}`}>
-          <Eye size={28} color="#ff3d8b" />
-        </div>
-        <div className="header-text">
-          <h2>FlowLens is {isActive ? 'watching...' : 'sleeping'}</h2>
-          <div className="status-indicator">
-            <span className={`dot ${isActive ? 'pulse-dot' : ''}`} style={{ backgroundColor: isActive ? '#00c9a7' : '#ff3d8b' }}></span>
-            <span className="status-text" style={{ color: isActive ? '#00c9a7' : '#ff3d8b' }}>
-              {isActive ? 'LIVE RECORDING' : 'OFFLINE'}
-            </span>
+    <div className="live-monitor-page">
+      <div className="badge-row">
+        <span className="badge badge-active">
+          <span className="badge-pulse"></span>
+          Session Active
+        </span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+          System Connection: {online ? 'Online' : 'Reconnecting...'}
+        </span>
+        <span style={{ marginLeft: 'auto', fontWeight: '600' }}>
+          Duration: {formatTime(timePassed)}
+        </span>
+      </div>
+
+      <div className="monitor-container">
+        <div className="card chart-section">
+          <h2>Tool Usage Allocation</h2>
+          <div className="chart-row">
+            <div className="chart-header">
+              <span>ChatGPT</span>
+              <span>{liveData.chatgpt}%</span>
+            </div>
+            <div className="bar-bg">
+              <div className="bar-fill" style={{ width: `${liveData.chatgpt}%` }}></div>
+            </div>
+          </div>
+
+          <div className="chart-row">
+            <div className="chart-header">
+              <span>Claude</span>
+              <span>{liveData.claude}%</span>
+            </div>
+            <div className="bar-bg">
+              <div className="bar-fill" style={{ width: `${liveData.claude}%` }}></div>
+            </div>
+          </div>
+
+          <div className="chart-row">
+            <div className="chart-header">
+              <span>Perplexity</span>
+              <span>{liveData.perplexity}%</span>
+            </div>
+            <div className="bar-bg">
+              <div className="bar-fill" style={{ width: `${liveData.perplexity}%` }}></div>
+            </div>
           </div>
         </div>
-      </header>
 
-      <div className="card-content">
-        <div className="section-title">Current Activity</div>
-        
-        <div className="info-row">
-          <div className="icon-wrapper"><Zap size={18} /></div>
-          <span className="label">Current Tool</span>
-          <span className="value tool-name">{isActive ? liveData.currentTool : 'None'}</span>
-        </div>
-
-        <div className="info-row">
-          <div className="icon-wrapper"><Code size={18} /></div>
-          <span className="label">Task Type</span>
-          <span className="value">{isActive ? liveData.taskType : 'Idle'}</span>
-        </div>
-
-        <div className="info-row">
-          <div className="icon-wrapper"><Clock size={18} /></div>
-          <span className="label">Session Time</span>
-          <span className="value time">{formatTime(sessionTime)}</span>
-        </div>
-      </div>
-
-      <div className="progress-section">
-        <div className="progress-header">
-          <div className="progress-title">
-            <CheckCircle2 size={16} className="icon" />
-            <span className="label">Live Prompt Quality</span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <div className="card">
+            <h2>Live Prompt Quality</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '0.5rem 0', fontWeight: '600' }}>
+              <span>Average Grade</span>
+              <span>{liveData.promptQuality}/100</span>
+            </div>
+            <div className="bar-bg" style={{ height: '12px' }}>
+              <div className="bar-fill" style={{ width: `${liveData.promptQuality}%`, backgroundColor: 'var(--accent)' }}></div>
+            </div>
           </div>
-          <span className="percentage">{isActive ? liveData.promptQuality : 0}%</span>
-        </div>
-        <div className="progress-bar-bg">
-          <div 
-            className="progress-bar-fill tool-live" 
-            style={{ width: `${isActive ? liveData.promptQuality : 0}%` }}
-          ></div>
+
+          <div className="card">
+            <h2 style={{ marginBottom: '1rem' }}>Active Insights</h2>
+            <div className="alerts-list">
+              {liveData.alerts.map(alert => (
+                <div key={alert.id} className="alert-card">
+                  <span>⚠️</span>
+                  <span>{alert.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="session-buttons">
-        {!isActive ? (
-          <button className="session-btn start-btn" onClick={handleStart} disabled={isProcessing}>
-            <Play size={18} className="btn-icon" />
-            <span>Start Session</span>
-          </button>
-        ) : (
-          <button className="session-btn stop-btn" onClick={handleStop}>
-            <Square size={18} className="btn-icon" />
-            <span>Stop & Get Report</span>
-          </button>
-        )}
+      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+        <button 
+          className="btn btn-danger" 
+          onClick={handleStopSession}
+          disabled={loading}
+        >
+          {loading ? 'Processing...' : 'Stop & Analyze Session'}
+        </button>
       </div>
-
-      {isProcessing && (
-        <div className="processing-note">
-          Indexing session & analyzing data... 
-        </div>
-      )}
     </div>
   );
 }
