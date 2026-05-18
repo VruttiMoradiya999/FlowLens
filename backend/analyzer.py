@@ -11,7 +11,12 @@ load_dotenv()
 live_data_store = {
     "prompts": [],
     "next_id": 1,
-    "current_tool": "None"
+    "current_tool": "None",
+    "tool_counts": {
+        "ChatGPT": 0,
+        "Claude": 0,
+        "Perplexity": 0
+    }
 }
 
 def analyze_latest_frame():
@@ -81,7 +86,14 @@ def analyze_latest_frame():
             result = json.loads(message_content)
             
             if result.get("is_ai_active"):
-                live_data_store["current_tool"] = result.get("tool_name", "AI")
+                tool = result.get("tool_name", "AI")
+                live_data_store["current_tool"] = tool
+                
+                # Dynamic tool counting
+                if tool in live_data_store["tool_counts"]:
+                    live_data_store["tool_counts"][tool] += 1
+                else:
+                    live_data_store["tool_counts"][tool] = 1
                 
                 if result.get("prompt_found") and result.get("original_prompt"):
                     orig = result["original_prompt"]
