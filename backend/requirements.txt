@@ -1,0 +1,2 @@
+# Master requirements pointing to core common dependencies
+-r requirements/common.txt

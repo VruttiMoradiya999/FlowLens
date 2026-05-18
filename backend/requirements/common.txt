@@ -1,0 +1,19 @@
+# Core FastAPI framework
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+
+# Screen capture and frame processing
+opencv-python>=4.9.0
+mss>=9.0.0
+numpy>=1.26.0
+
+# HTTP requests & configuration envs
+requests>=2.31.0
+python-dotenv>=1.0.0
+
+# AI Orchestration and Agent framework
+agno>=1.0.0
+
+# Video indexing and scene memory
+videodb>=0.2.0

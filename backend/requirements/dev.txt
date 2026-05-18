@@ -1,0 +1,5 @@
+# Local development and linting tools
+-r common.txt
+pytest>=8.0.0
+black>=24.0.0
+flake8>=7.0.0
