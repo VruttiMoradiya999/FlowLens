@@ -5,8 +5,10 @@ export default function Home() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
   const handleStartSession = async () => {
+    setShowModal(false);
     setLoading(true);
     setError('');
     try {
@@ -39,7 +41,7 @@ export default function Home() {
         </div>
         <button 
           className="btn btn-primary" 
-          onClick={handleStartSession}
+          onClick={() => setShowModal(true)}
           disabled={loading}
         >
           {loading ? 'Starting...' : 'Start Session'}
@@ -47,14 +49,44 @@ export default function Home() {
         {error && <p style={{ color: 'var(--accent-cool)', marginTop: '1rem', fontSize: '0.9rem' }}>{error}</p>}
       </section>
 
+      {/* Playful Permission Modal Popup */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2 className="modal-title">
+              <span>👁️</span> Allow Screen Capture?
+            </h2>
+            <p className="modal-desc">
+              FlowLens is ready to read and analyze your AI interactions in real-time. 
+              Everything runs 100% locally and securely on your Mac—no cloud uploads, fully private!
+            </p>
+            <div className="modal-tip">
+              <strong>💡 Pro Tip:</strong> Make sure screen recording permissions are toggled ON for <strong>VS Code</strong> or <strong>Terminal</strong> in your Mac System Settings!
+            </div>
+            <div className="modal-actions">
+              <button 
+                className="btn" 
+                style={{ borderRadius: '999px', boxShadow: 'none' }}
+                onClick={() => setShowModal(false)}
+              >
+                Deny
+              </button>
+              <button 
+                className="btn btn-primary" 
+                style={{ borderRadius: '999px', boxShadow: 'none' }}
+                onClick={handleStartSession}
+              >
+                Allow & Start
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <section className="grid-3">
         <div className="card">
           <div className="card-title">AI Mastery Score</div>
           <div className="card-value">74/100</div>
-        </div>
-        <div className="card">
-          <div className="card-title">Time Saved</div>
-          <div className="card-value">1h 45m</div>
         </div>
         <div className="card">
           <div className="card-title">Prompt Quality</div>

@@ -73,12 +73,12 @@ def analyze_latest_frame():
             "format": "json"
         }
         
-        response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=15)
+        response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=60)
         
         if response.status_code != 200:
             # Fallback to llava
             payload["model"] = "llava"
-            response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=15)
+            response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=60)
 
         if response.status_code == 200:
             response_data = response.json()
@@ -117,6 +117,8 @@ def analyze_latest_frame():
         else:
             print(f"Ollama returned error status: {response.status_code}")
                             
+    except requests.exceptions.ReadTimeout:
+        print("⏳ Local Ollama vision request timed out (taking > 60s). Make sure llama3.2-vision is pulled and running!")
     except requests.exceptions.ConnectionError:
         # Avoid massive traceback spam if Ollama is not yet active/installed
         pass

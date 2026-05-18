@@ -10,6 +10,15 @@ from analyzer import continuous_analysis_loop, live_data_store
 
 app = FastAPI(title="FlowLens API")
 
+@app.get("/")
+async def root():
+    return {
+        "message": "FlowLens Backend API is running successfully! 👁️",
+        "health": "http://localhost:8000/health",
+        "live_prompts": "http://localhost:8000/live_prompts",
+        "dashboard_ui": "Please open your frontend dashboard at http://localhost:5173"
+    }
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -44,11 +53,13 @@ async def stop_session():
     current_session["video_id"] = video_id
     
     if video_id:
-        # Index the session
-        index_session(video_id)
+        # Start indexing in the background so the HTTP response returns INSTANTLY to prevent timeouts!
+        asyncio.create_task(
+            asyncio.to_thread(index_session, video_id)
+        )
         return {"status": "Session indexed ✅", "video_id": video_id}
     else:
-        return {"status": "Session stopped but upload failed ❌"}
+        return {"status": "Session stopped but upload failed ❌", "video_id": None}
 
 @app.get("/report/{video_id}")
 async def get_report(video_id: str):
