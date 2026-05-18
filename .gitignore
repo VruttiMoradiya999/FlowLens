@@ -62,3 +62,7 @@ Icon
 *.jpg
 *.jpeg
 *.png
+
+# Allow tracking assets in the public folder
+!frontend/public/*.png
+!frontend/public/*.svg

@@ -9,17 +9,17 @@
 ## Interactive Showcase Gallery
 
 ### Cozy Neo-Brutalist Dashboard Landing Page
-![Cozy Neo-Brutalist Dashboard Landing Page](frontend/public/Screenshot%202026-05-18%20at%209.32.02%20AM.png)
+![Cozy Neo-Brutalist Dashboard Landing Page](frontend/public/dashboard_home.png)
 
 ### Dynamic Screen Permission Request Notification
-![Dynamic Screen Permission Request Notification](frontend/public/Screenshot%202026-05-18%20at%209.32.22%20AM.png)
+![Dynamic Screen Permission Request Notification](frontend/public/permission_modal.png)
 
 ### Real-Time Screen & AI Prompt Monitor
-![Real-Time Screen & AI Prompt Monitor](frontend/public/Screenshot%202026-05-18%20at%209.32.41%20AM.png)
+![Real-Time Screen & AI Prompt Monitor](frontend/public/live_monitor.png)
 
 ### Local AI Session Intelligence Report
-![Local AI Session Intelligence Report Part 1](frontend/public/Screenshot%202026-05-18%20at%209.32.54%20AM.png)
-![Local AI Session Intelligence Report Part 2](frontend/public/Screenshot%202026-05-18%20at%209.33.01%20AM.png)
+![Local AI Session Intelligence Report Part 1](frontend/public/session_report_1.png)
+![Local AI Session Intelligence Report Part 2](frontend/public/session_report_2.png)
 
 ---
 
