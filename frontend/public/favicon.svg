@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+  <!-- Soft pastel pink backing circle -->
+  <circle cx="12" cy="12" r="11" fill="#FFF5F6" stroke="#1B2A24" stroke-width="1.5"/>
+  <!-- Cute retro pupil drop shadow -->
+  <ellipse cx="13" cy="13" rx="7" ry="4.5" fill="#1B2A24" opacity="0.15"/>
+  <!-- Sleek bold retro eye outline -->
+  <path d="M12 7.5C7.5 7.5 3.8 10.3 2 12c1.8 1.7 5.5 4.5 10 4.5s8.2-2.8 10-4.5c-1.8-1.7-5.5-4.5-10-4.5z" fill="none" stroke="#1B2A24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Vibrant mint green iris -->
+  <circle cx="12" cy="12" r="3.2" fill="#1D9E75" stroke="#1B2A24" stroke-width="1.5"/>
+  <!-- Playful anime eye highlight -->
+  <circle cx="10.8" cy="10.8" r="1" fill="#FFFFFF"/>
+</svg>
